@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Preenchimento e impressão do Instrumento de Medição de Resultado.">
+  <title>IMR - Instrumento de Medição de Resultado</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%231b3a57'/%3E%3Cpath d='M16 14h32v36H16z' fill='white'/%3E%3Cpath d='M23 25h18M23 33h18M23 41h12' stroke='%231b3a57' stroke-width='4'/%3E%3C/svg%3E">
+  <style>
+    :root { --ink:#17212b; --blue:#173a59; --imr-dark:#2f5496; --imr-mid:#4472c4; --imr-light:#dae3f3; --paper:#fff; --line:#111; --page-width:210mm; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:#e9eef2; font-family:Arial, Helvetica, sans-serif; }
+    .appbar { padding:24px max(24px, calc((100% - 1160px)/2)); background:var(--blue); color:white; display:flex; justify-content:space-between; align-items:center; gap:16px; }
+    .appbar h1 { font-size:1.25rem; margin:0; }
+    .appbar p { margin:4px 0 0; color:#cfe0ec; font-size:.9rem; }
+    .layout { max-width:1160px; margin:28px auto; padding:0 24px; }
+    .form-card { max-width:920px; margin:auto; background:white; border-radius:12px; padding:28px; box-shadow:0 12px 35px #24394a1c; }
+    h2 { margin:0 0 20px; font-size:1.3rem; color:var(--blue); }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .full { grid-column:1 / -1; }
+    label { display:block; color:#33485a; font-size:.82rem; font-weight:700; margin-bottom:6px; }
+    input, textarea { width:100%; border:1px solid #b9c5cf; border-radius:6px; color:#18232d; padding:10px; font:inherit; }
+    input:focus, textarea:focus { outline:3px solid #9fc1d8; border-color:var(--blue); }
+    textarea { min-height:68px; resize:vertical; }
+    .occurrences { margin-top:26px; border-top:1px solid #d5dde3; padding-top:22px; }
+    .occurrence-grid { display:grid; grid-template-columns:1fr 110px; gap:10px 16px; align-items:end; margin-bottom:14px; }
+    .occurrence-grid label { margin:0; }
+    .actions { display:flex; justify-content:flex-end; gap:12px; margin-top:28px; }
+    button { border:0; border-radius:7px; padding:11px 17px; font:700 .95rem Arial,sans-serif; cursor:pointer; }
+    .primary { background:var(--blue); color:#fff; } .secondary { background:#dce7ee; color:#173a59; }
+    .preview-actions { width:var(--page-width); margin:22px auto 12px; display:flex; justify-content:space-between; align-items:center; }
+    .document { width:var(--page-width); min-height:297mm; margin:0 auto 32px; background:var(--paper); padding:31mm 20mm 24mm; color:#000; font-family:'Times New Roman', Times, serif; font-size:12.1pt; }
+    .document-title { text-align:center; margin:0 0 9px; font-size:15.5pt; font-weight:700; }
+    table { width:100%; border-collapse:collapse; }
+    td, th { border:1px solid var(--line); padding:6px 7px; vertical-align:middle; }
+    .identification td { min-height:28px; }
+    .field-label { font-weight:700; }
+    .split-left { width:61.5%; }
+    .section { margin-top:10px; }
+    .section-title { text-align:center; font-weight:700; font-size:12.7pt; padding:8px 6px; background:var(--imr-dark); color:#fff; }
+    .occ-table th { font-size:12.5pt; text-align:center; padding:8px; background:var(--imr-mid); color:#fff; }
+    .occ-table td { line-height:1.15; }
+    .occ-table tbody tr:nth-child(even) td { background:var(--imr-light); }
+    .points { width:14.2%; text-align:center; white-space:nowrap; }
+    .total td { font-weight:700; }
+    .assessment td { padding:11px 8px; }
+    .footer-table { margin-top:9px; }
+    .footer-table .fiscal { width:71.5%; }
+    .hidden { display:none !important; }
+    @page { size:A4 portrait; margin:0; }
+    @media (max-width:750px) { .grid { grid-template-columns:1fr; } .full { grid-column:auto; } .form-card { padding:20px; } .document { transform-origin:top center; } .preview-actions { width:auto; margin:16px 12px; } }
+    @media print { body { background:white; } .no-print, .appbar, .form-card { display:none !important; } .layout { margin:0; padding:0; max-width:none; } .preview { display:block !important; } .document { margin:0; padding:31mm 20mm 24mm; width:210mm; min-height:297mm; box-shadow:none; } }
+  </style>
+</head>
+<body>
+  <header class="appbar no-print"><div><h1>Instrumento de Medição de Resultado</h1><p>Preencha os campos e gere o documento para impressão.</p></div></header>
+  <main class="layout">
+    <section id="formView" class="form-card no-print">
+      <h2>Dados do IMR</h2>
+      <form id="imrForm">
+        <div class="grid">
+          <div><label for="contract">Contrato nº</label><input id="contract" value="05/2021 - UFRN" required></div>
+          <div><label for="validity">Vigência</label><input id="validity" value="09/04/2027" required></div>
+          <div class="full"><label for="contractor">Contratado</label><input id="contractor" value="00.948.060/0001-30 - INSTRUCON COMÉRCIO E SERVIÇOS LTDA - ME" required></div>
+          <div class="full"><label for="unit">Unidade da UFRN</label><input id="unit" value="CENTRO DE CIÊNCIAS HUMANAS, LETRAS E ARTES (13.00)" required></div>
+          <div class="full"><label for="subunit">Subunidade</label><input id="subunit" value="CENTRO DE CIÊNCIAS HUMANAS, LETRAS E ARTES (13.00)" required></div>
+          <div><label for="budget">Orçamento da contratada nº</label><input id="budget" value="7058" required></div>
+          <div><label for="request">Requisição de material/serviço contratado nº</label><input id="request" value="1455/2026" required></div>
+          <div><label for="serviceDate">Data do atendimento da requisição</label><input id="serviceDate" value="10/09/2026" required></div>
+          <div><label for="fiscal">Fiscal responsável</label><input id="fiscal" value="Rafael de Macêdo Freire" required></div>
+          <div><label for="registration">Matrícula</label><input id="registration" value="1952385" required></div>
+          <div><label for="ordinance">Portaria de designação nº</label><input id="ordinance" value="60/2021" required></div>
+        </div>
+        <div class="occurrences"><h2>Ocorrências e pontuação</h2><div id="occurrenceInputs"></div></div>
+        <div class="actions"><button type="submit" class="primary">Gerar documento</button></div>
+      </form>
+    </section>
+    <section id="preview" class="preview hidden">
+      <div class="preview-actions no-print"><button type="button" class="secondary" id="editBtn">Editar dados</button><button type="button" class="primary" id="printBtn">Imprimir</button></div>
+      <article class="document" aria-label="Prévia do Instrumento de Medição de Resultado">
+        <h1 class="document-title">INSTRUMENTO DE MEDIÇÃO DE RESULTADO</h1>
+        <table class="identification"><tr><td class="split-left"><span class="field-label">CONTRATO Nº:</span> <span data-out="contract"></span></td><td><span class="field-label">VIGÊNCIA:</span> <span data-out="validity"></span></td></tr><tr><td colspan="2"><span class="field-label">CONTRATADO:</span> <span data-out="contractor"></span></td></tr><tr><td colspan="2"><span class="field-label">UNIDADE DA UFRN:</span> <span data-out="unit"></span></td></tr><tr><td colspan="2"><span class="field-label">SUBUNIDADE:</span> <span data-out="subunit"></span></td></tr><tr><td colspan="2"><span class="field-label">ORÇAMENTO DA CONTRATADA Nº:</span> <span data-out="budget"></span></td></tr></table>
+        <table class="identification"><tr><td><span class="field-label">REQUISIÇÃO DE MATERIAL/SERVIÇO CONTRATADO Nº:</span> <span data-out="request"></span></td></tr><tr><td><span class="field-label">DATA DO ATENDIMENTO DA REQUISIÇÃO:</span> <span data-out="serviceDate"></span></td></tr></table>
+        <section class="section"><table><tr><td class="section-title">OCORRÊNCIAS RELACIONADAS À EXECUÇÃO DO CONTRATO</td></tr></table><table class="occ-table"><thead><tr><th>OCORRÊNCIA</th><th class="points">PONTOS</th></tr></thead><tbody id="occurrenceRows"></tbody><tfoot><tr class="total"><td>IMR TOTAL</td><td class="points" id="totalPoints">0,0</td></tr></tfoot></table></section>
+        <section class="assessment"><table><tr><td class="section-title">RESULTADO DA AVALIAÇÃO DO SERVIÇO PRESTADO PELA CONTRATADA</td></tr><tr><td id="assessmentText">IMR ≤ 0,3: 100% do valor da Nota Fiscal MENSAL</td></tr></table></section>
+        <table class="footer-table"><tr><td class="fiscal"><span class="field-label">FISCAL RESPONSÁVEL:</span> <span data-out="fiscal"></span></td><td><span class="field-label">MATRÍCULA:</span> <span data-out="registration"></span></td></tr><tr><td colspan="2"><span class="field-label">PORTARIA DE DESIGNAÇÃO Nº:</span> <span data-out="ordinance"></span></td></tr></table>
+      </article>
+    </section>
+  </main>
+  <script>
+    const occurrences = [
+      'Não atendimento do telefone fornecido pela CONTRATADA para os contatos e registro das ocorrências - Por 3 tentativas de ligações seguidamente efetuadas (0,3)',
+      'Atraso na execução dos serviços cujos prazos encontram-se estabelecidos no Modelo de Execução do Objeto do Termo de Referência - Por dia de atraso (0,3)',
+      'Atraso na prestação das informações, esclarecimentos solicitados pelo CONTRATANTE - Para cada 24 horas de atraso (0,3)',
+      'Não manutenção no SICAF das condições de habilitação - Por ocorrência/dia (0,3)',
+      'Apresentação da fatura sem os documentos complementares exigidos para efetivação do pagamento - Por dia de atraso após notificado (0,3)',
+      'Cobrança por serviços não realizados - Para cada serviço cobrado indevidamente (1,3)'
+    ];
+    const inputs = document.getElementById('occurrenceInputs');
+    inputs.innerHTML = occurrences.map((label, i) => `<div class="occurrence-grid"><label for="points${i}">${label}</label><div><label for="points${i}">Pontos</label><input id="points${i}" type="number" min="0" step="0.1" value="0"></div></div>`).join('');
+    const form = document.getElementById('imrForm'); const preview = document.getElementById('preview'); const formView = document.getElementById('formView');
+    const brNumber = value => Number(value || 0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+    function fillDocument() {
+      document.querySelectorAll('[data-out]').forEach(el => el.textContent = document.getElementById(el.dataset.out).value.trim());
+      const points = occurrences.map((label,i) => ({label, value:Number(document.getElementById(`points${i}`).value || 0)}));
+      document.getElementById('occurrenceRows').innerHTML = points.map(item => `<tr><td>${item.label}</td><td class="points">${brNumber(item.value)}</td></tr>`).join('');
+      const total = points.reduce((sum,item)=>sum+item.value,0); document.getElementById('totalPoints').textContent=brNumber(total);
+      document.getElementById('assessmentText').textContent = total <= .3 ? 'IMR ≤ 0,3: 100% do valor da Nota Fiscal MENSAL' : 'IMR > 0,3: aplicar o desconto correspondente, conforme o contrato.';
+    }
+    form.addEventListener('submit', event => { event.preventDefault(); fillDocument(); formView.classList.add('hidden'); preview.classList.remove('hidden'); window.scrollTo({top:0,behavior:'smooth'}); });
+    document.getElementById('editBtn').addEventListener('click', () => { preview.classList.add('hidden'); formView.classList.remove('hidden'); window.scrollTo({top:0,behavior:'smooth'}); });
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+  </script>
+</body>
+</html>
